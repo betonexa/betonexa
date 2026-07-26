@@ -1,0 +1,9 @@
+{
+  "name": "Betonexa Demo",
+  "short_name": "Betonexa",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f3f5f8",
+  "theme_color": "#151a22",
+  "description": "Beton sevkiyat planlama demo uygulaması"
+}

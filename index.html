@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#151a22" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Betonexa Demo</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand-wrap">
+        <div class="brand-mark">B</div>
+        <div>
+          <div class="brand">Beton<span>exa</span></div>
+          <div class="subtitle">Concrete Dispatch Planning</div>
+        </div>
+      </div>
+      <button class="icon-btn" id="themeBtn" aria-label="Tema değiştir">◐</button>
+    </header>
+
+    <main>
+      <section id="loginView" class="view active">
+        <div class="hero-card">
+          <div class="eyebrow">BETONEXA DEMO</div>
+          <h1>Sevkiyatı tek ekrandan planla.</h1>
+          <p>Beton santrali, pompa ve döküm bilgilerini mobil cihazından kolayca yönet.</p>
+
+          <div class="login-card">
+            <label for="userSelect">Kullanıcı</label>
+            <select id="userSelect">
+              <option>Özlem Gülbay</option>
+              <option>Cem Ekici</option>
+              <option>Ali Oğuz</option>
+            </select>
+
+            <label for="passwordInput">Şifre</label>
+            <input id="passwordInput" type="password" value="1234" placeholder="Şifre" />
+
+            <button id="loginBtn" class="primary-btn">Demo'ya Giriş Yap</button>
+            <div class="demo-note">Demo şifresi: <strong>1234</strong></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="dashboardView" class="view">
+        <div class="welcome-row">
+          <div>
+            <div class="muted">Hoş geldin,</div>
+            <h2 id="welcomeName">Özlem Gülbay</h2>
+          </div>
+          <button id="logoutBtn" class="text-btn">Çıkış</button>
+        </div>
+
+        <div class="summary-grid">
+          <div class="summary-card">
+            <span>Bugünkü sevkiyat</span>
+            <strong id="todayCount">0</strong>
+          </div>
+          <div class="summary-card">
+            <span>Toplam miktar</span>
+            <strong><span id="totalM3">0</span> m³</strong>
+          </div>
+          <div class="summary-card wide">
+            <span>Aktif santral</span>
+            <strong id="activePlants">0</strong>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <button id="addShipmentBtn" class="primary-btn compact">+ Yeni Sevkiyat</button>
+          <input id="searchInput" type="search" placeholder="Şantiye, firma veya santral ara" />
+        </div>
+
+        <div class="filter-row">
+          <button class="filter-chip active" data-filter="all">Tümü</button>
+          <button class="filter-chip" data-filter="today">Bugün</button>
+          <button class="filter-chip" data-filter="pompalı">Pompalı</button>
+          <button class="filter-chip" data-filter="pompasız">Pompasız</button>
+        </div>
+
+        <div id="shipmentList" class="shipment-list"></div>
+      </section>
+    </main>
+  </div>
+
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-backdrop" id="modalBackdrop"></div>
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <div class="eyebrow">SEVKİYAT FORMU</div>
+          <h3 id="modalTitle">Yeni Sevkiyat</h3>
+        </div>
+        <button class="icon-btn" id="closeModalBtn">✕</button>
+      </div>
+
+      <form id="shipmentForm">
+        <input type="hidden" id="editId" />
+
+        <div class="form-grid two">
+          <div>
+            <label for="date">Tarih</label>
+            <input id="date" type="date" required />
+          </div>
+          <div>
+            <label for="time">Saat</label>
+            <input id="time" type="time" required />
+          </div>
+        </div>
+
+        <label for="plant">Santral</label>
+        <select id="plant" required></select>
+
+        <label for="company">Firma</label>
+        <input id="company" type="text" placeholder="Firma adı" required />
+
+        <label for="site">Şantiye</label>
+        <input id="site" type="text" placeholder="Şantiye adı / bölge" required />
+
+        <div class="form-grid two">
+          <div>
+            <label for="concreteClass">Beton sınıfı</label>
+            <select id="concreteClass">
+              <option>C25/30</option>
+              <option>C30/37</option>
+              <option>C35/45</option>
+              <option>C40/50</option>
+              <option>C45/55</option>
+            </select>
+          </div>
+          <div>
+            <label for="amount">Miktar (m³)</label>
+            <input id="amount" type="number" min="1" step="1" value="30" required />
+          </div>
+        </div>
+
+        <div class="form-grid two">
+          <div>
+            <label for="pumpStatus">Pompa</label>
+            <select id="pumpStatus">
+              <option value="Pompalı">Pompalı</option>
+              <option value="Pompasız">Pompasız</option>
+            </select>
+          </div>
+          <div>
+            <label for="pumpType">Pompa tipi</label>
+            <select id="pumpType">
+              <option>38'lik</option>
+              <option>42'lik</option>
+              <option>47'lik</option>
+              <option>52'lik</option>
+              <option>56'lık</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-grid two">
+          <div>
+            <label for="slump">Kıvam</label>
+            <select id="slump">
+              <option>S3</option>
+              <option>S4</option>
+            </select>
+          </div>
+          <div>
+            <label for="gross">Brüt</label>
+            <select id="gross">
+              <option>Hayır</option>
+              <option>Evet</option>
+            </select>
+          </div>
+        </div>
+
+        <label for="additive">Katkı</label>
+        <select id="additive">
+          <option>Standart</option>
+          <option>Katkısız</option>
+        </select>
+
+        <label for="contact">Sorumlu / Telefon</label>
+        <input id="contact" type="text" placeholder="Ad Soyad - 05xx xxx xx xx" />
+
+        <div id="conflictWarning" class="warning hidden">
+          Bu tarih ve saatte aynı pompa tipi için başka bir sevkiyat bulunuyor.
+        </div>
+
+        <button class="primary-btn" type="submit">Kaydet</button>
+      </form>
+    </div>
+  </div>
+
+  <template id="shipmentCardTemplate">
+    <article class="shipment-card">
+      <div class="shipment-top">
+        <div>
+          <div class="date-line"></div>
+          <h3 class="site-line"></h3>
+          <div class="company-line muted"></div>
+        </div>
+        <span class="status-badge"></span>
+      </div>
+      <div class="shipment-details">
+        <div><span>Santral</span><strong class="plant-line"></strong></div>
+        <div><span>Beton</span><strong class="concrete-line"></strong></div>
+        <div><span>Miktar</span><strong class="amount-line"></strong></div>
+        <div><span>Pompa</span><strong class="pump-line"></strong></div>
+      </div>
+      <div class="shipment-footer">
+        <span class="contact-line"></span>
+        <div>
+          <button class="small-btn edit-btn">Düzenle</button>
+          <button class="small-btn danger delete-btn">Sil</button>
+        </div>
+      </div>
+    </article>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>
