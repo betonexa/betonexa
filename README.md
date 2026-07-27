@@ -1,26 +1,18 @@
-# Betonexa Demo
+# Betonexa v2
 
-Mobil uyumlu, statik beton sevkiyat planlama demosu.
-
-## Demo girişi
-
-- Kullanıcı: Özlem Gülbay, Cem Ekici veya Ali Oğuz
-- Şifre: `1234`
+Akıllı beton sevkiyat yönetimi için yenilenmiş mobil uyumlu demo.
 
 ## Özellikler
+- Açık / koyu / sistem teması
+- Günlük operasyon özeti
+- Betonexa IQ akıllı plan uyarıları
+- Pompa çakışma tespiti
+- Sevkiyat durum renkleri
+- Zaman çizelgesi ve santral kapasite görünümü
+- Arama, filtreleme, ekleme, düzenleme ve silme
+- Verileri tarayıcıda localStorage ile saklama
 
-- Sevkiyat listeleme
-- Yeni sevkiyat ekleme
-- Sevkiyat düzenleme ve silme
-- Arama ve filtreleme
-- 47'lik, 52'lik ve 56'lık pompalarda aynı tarih/saat çakışma uyarısı
-- Verilerin tarayıcıda saklanması
-- Mobil uyumlu görünüm
-- Vercel ve GitHub Pages ile yayınlanabilir
+## Çalıştırma
+`npm start` veya `npx serve .`
 
-## Vercel'e yükleme
-
-Bu klasördeki tüm dosyaları GitHub reposunun ana dizinine yükleyin.
-Vercel'de repoyu seçip **Deploy** düğmesine basın.
-Framework Preset için **Other** seçilebilir.
-Build Command ve Output Directory alanlarını boş bırakabilirsiniz.
+Demo şifresi: `1234`

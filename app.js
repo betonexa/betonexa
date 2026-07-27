@@ -1,232 +1,27 @@
-const plants = [
-  "Işıkkent","Torbalı","Gaziemir","Özbek","Çeşme","Çiğli","Koyundere",
-  "Aliağa","Zeytindağ","Akhisar","Aydın","Tekirdağ","Kıraç","Çorlu"
+const plants=["Işıkkent","Torbalı","Gaziemir","Özbek","Çeşme","Çiğli","Koyundere","Aliağa","Zeytindağ","Akhisar","Aydın","Tekirdağ","Kıraç","Çorlu"];
+const todayISO=()=>new Date().toISOString().slice(0,10); const tomorrowISO=()=>new Date(Date.now()+86400000).toISOString().slice(0,10);
+const defaultShipments=[
+{id:1,date:todayISO(),time:"08:30",plant:"Işıkkent",company:"Önerge Yapı",site:"Bornova Konutları",concreteClass:"C30/37",amount:48,pumpStatus:"Pompalı",pumpType:"47'lik",slump:"S4",gross:"Hayır",additive:"Standart",contact:"Mehmet Usta - 0532 000 00 01"},
+{id:2,date:todayISO(),time:"11:00",plant:"Gaziemir",company:"Ege İnşaat",site:"Menderes Fabrika",concreteClass:"C35/45",amount:72,pumpStatus:"Pompasız",pumpType:"-",slump:"S3",gross:"Evet",additive:"Katkısız",contact:"Hasan Bey - 0533 000 00 02"},
+{id:3,date:todayISO(),time:"11:00",plant:"Torbalı",company:"Güven Beton",site:"Ayrancılar Villa Projesi",concreteClass:"C25/30",amount:36,pumpStatus:"Pompalı",pumpType:"47'lik",slump:"S3",gross:"Hayır",additive:"Standart",contact:"Ali Usta - 0534 000 00 03"},
+{id:4,date:tomorrowISO(),time:"09:15",plant:"Çiğli",company:"Kuzey Yapı",site:"Menemen Lojistik Merkezi",concreteClass:"C40/50",amount:54,pumpStatus:"Pompalı",pumpType:"42'lik",slump:"S4",gross:"Hayır",additive:"Standart",contact:"Emre Bey - 0535 000 00 04"}
 ];
-
-const defaultShipments = [
-  {
-    id: 1, date: new Date().toISOString().slice(0,10), time: "08:30",
-    plant: "Işıkkent", company: "Önerge Yapı", site: "Bornova Konutları",
-    concreteClass: "C30/37", amount: 48, pumpStatus: "Pompalı", pumpType: "47'lik",
-    slump: "S4", gross: "Hayır", additive: "Standart",
-    contact: "Mehmet Usta - 0532 000 00 01"
-  },
-  {
-    id: 2, date: new Date().toISOString().slice(0,10), time: "11:00",
-    plant: "Gaziemir", company: "Ege İnşaat", site: "Menderes Fabrika",
-    concreteClass: "C35/45", amount: 72, pumpStatus: "Pompasız", pumpType: "-",
-    slump: "S3", gross: "Evet", additive: "Katkısız",
-    contact: "Hasan Bey - 0533 000 00 02"
-  },
-  {
-    id: 3, date: new Date(Date.now()+86400000).toISOString().slice(0,10), time: "09:15",
-    plant: "Torbalı", company: "Güven Beton", site: "Ayrancılar Villa Projesi",
-    concreteClass: "C25/30", amount: 36, pumpStatus: "Pompalı", pumpType: "42'lik",
-    slump: "S3", gross: "Hayır", additive: "Standart",
-    contact: "Ali Usta - 0534 000 00 03"
-  }
-];
-
-let shipments = JSON.parse(localStorage.getItem("betonexaShipments")) || defaultShipments;
-let activeFilter = "all";
-let currentUser = localStorage.getItem("betonexaUser") || "";
-
-const $ = (id) => document.getElementById(id);
-const loginView = $("loginView");
-const dashboardView = $("dashboardView");
-const modal = $("modal");
-const shipmentList = $("shipmentList");
-const template = $("shipmentCardTemplate");
-
-function save() {
-  localStorage.setItem("betonexaShipments", JSON.stringify(shipments));
-}
-
-function showDashboard(user) {
-  currentUser = user;
-  localStorage.setItem("betonexaUser", user);
-  $("welcomeName").textContent = user;
-  loginView.classList.remove("active");
-  dashboardView.classList.add("active");
-  render();
-}
-
-function showLogin() {
-  localStorage.removeItem("betonexaUser");
-  dashboardView.classList.remove("active");
-  loginView.classList.add("active");
-}
-
-function formatDate(dateStr) {
-  return new Intl.DateTimeFormat("tr-TR", {
-    day:"2-digit", month:"long", year:"numeric", weekday:"long"
-  }).format(new Date(dateStr + "T12:00:00"));
-}
-
-function render() {
-  const query = $("searchInput").value.trim().toLocaleLowerCase("tr-TR");
-  const today = new Date().toISOString().slice(0,10);
-
-  const filtered = shipments
-    .filter(item => {
-      if (activeFilter === "today" && item.date !== today) return false;
-      if (activeFilter === "pompalı" && item.pumpStatus !== "Pompalı") return false;
-      if (activeFilter === "pompasız" && item.pumpStatus !== "Pompasız") return false;
-      const haystack = `${item.site} ${item.company} ${item.plant}`.toLocaleLowerCase("tr-TR");
-      return haystack.includes(query);
-    })
-    .sort((a,b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`));
-
-  shipmentList.innerHTML = "";
-
-  if (!filtered.length) {
-    shipmentList.innerHTML = '<div class="empty-state">Bu filtreye uygun sevkiyat bulunamadı.</div>';
-  }
-
-  filtered.forEach(item => {
-    const card = template.content.cloneNode(true);
-    card.querySelector(".date-line").textContent = `${formatDate(item.date)} • ${item.time}`;
-    card.querySelector(".site-line").textContent = item.site;
-    card.querySelector(".company-line").textContent = item.company;
-    card.querySelector(".status-badge").textContent = item.pumpStatus;
-    card.querySelector(".plant-line").textContent = item.plant;
-    card.querySelector(".concrete-line").textContent = `${item.concreteClass} / ${item.slump}`;
-    card.querySelector(".amount-line").textContent = `${item.amount} m³`;
-    card.querySelector(".pump-line").textContent = item.pumpStatus === "Pompalı" ? item.pumpType : "Pompasız";
-    card.querySelector(".contact-line").textContent = item.contact || "Sorumlu bilgisi yok";
-    card.querySelector(".edit-btn").addEventListener("click", () => openModal(item));
-    card.querySelector(".delete-btn").addEventListener("click", () => {
-      if (confirm("Bu sevkiyat silinsin mi?")) {
-        shipments = shipments.filter(x => x.id !== item.id);
-        save();
-        render();
-      }
-    });
-    shipmentList.appendChild(card);
-  });
-
-  const todays = shipments.filter(x => x.date === today);
-  $("todayCount").textContent = todays.length;
-  $("totalM3").textContent = todays.reduce((sum,x) => sum + Number(x.amount), 0);
-  $("activePlants").textContent = new Set(todays.map(x => x.plant)).size;
-}
-
-function openModal(item = null) {
-  $("modalTitle").textContent = item ? "Sevkiyatı Düzenle" : "Yeni Sevkiyat";
-  $("editId").value = item?.id || "";
-  $("date").value = item?.date || new Date().toISOString().slice(0,10);
-  $("time").value = item?.time || "08:00";
-  $("plant").value = item?.plant || plants[0];
-  $("company").value = item?.company || "";
-  $("site").value = item?.site || "";
-  $("concreteClass").value = item?.concreteClass || "C30/37";
-  $("amount").value = item?.amount || 30;
-  $("pumpStatus").value = item?.pumpStatus || "Pompalı";
-  $("pumpType").value = item?.pumpType || "47'lik";
-  $("slump").value = item?.slump || "S3";
-  $("gross").value = item?.gross || "Hayır";
-  $("additive").value = item?.additive || "Standart";
-  $("contact").value = item?.contact || "";
-  togglePumpType();
-  checkConflict();
-  modal.classList.remove("hidden");
-}
-
-function closeModal() {
-  modal.classList.add("hidden");
-}
-
-function togglePumpType() {
-  const disabled = $("pumpStatus").value === "Pompasız";
-  $("pumpType").disabled = disabled;
-  if (disabled) $("pumpType").value = "38'lik";
-  checkConflict();
-}
-
-function checkConflict() {
-  const warning = $("conflictWarning");
-  const pumpStatus = $("pumpStatus").value;
-  const pumpType = $("pumpType").value;
-  const watched = ["47'lik","52'lik","56'lık"];
-  const id = Number($("editId").value || 0);
-
-  const conflict = pumpStatus === "Pompalı" && watched.includes(pumpType) &&
-    shipments.some(x =>
-      x.id !== id &&
-      x.date === $("date").value &&
-      x.time === $("time").value &&
-      x.pumpStatus === "Pompalı" &&
-      x.pumpType === pumpType
-    );
-
-  warning.classList.toggle("hidden", !conflict);
-}
-
-$("loginBtn").addEventListener("click", () => {
-  if ($("passwordInput").value !== "1234") {
-    alert("Şifre hatalı. Demo şifresi 1234.");
-    return;
-  }
-  showDashboard($("userSelect").value);
-});
-
-$("logoutBtn").addEventListener("click", showLogin);
-$("addShipmentBtn").addEventListener("click", () => openModal());
-$("closeModalBtn").addEventListener("click", closeModal);
-$("modalBackdrop").addEventListener("click", closeModal);
-$("searchInput").addEventListener("input", render);
-$("pumpStatus").addEventListener("change", togglePumpType);
-["date","time","pumpType"].forEach(id => $(id).addEventListener("change", checkConflict));
-
-document.querySelectorAll(".filter-chip").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".filter-chip").forEach(x => x.classList.remove("active"));
-    btn.classList.add("active");
-    activeFilter = btn.dataset.filter;
-    render();
-  });
-});
-
-$("shipmentForm").addEventListener("submit", (e) => {
-  e.preventDefault();
-  const id = Number($("editId").value || Date.now());
-  const item = {
-    id,
-    date: $("date").value,
-    time: $("time").value,
-    plant: $("plant").value,
-    company: $("company").value.trim(),
-    site: $("site").value.trim(),
-    concreteClass: $("concreteClass").value,
-    amount: Number($("amount").value),
-    pumpStatus: $("pumpStatus").value,
-    pumpType: $("pumpStatus").value === "Pompalı" ? $("pumpType").value : "-",
-    slump: $("slump").value,
-    gross: $("gross").value,
-    additive: $("additive").value,
-    contact: $("contact").value.trim()
-  };
-
-  const index = shipments.findIndex(x => x.id === id);
-  if (index >= 0) shipments[index] = item;
-  else shipments.push(item);
-
-  save();
-  closeModal();
-  render();
-});
-
-$("themeBtn").addEventListener("click", () => {
-  document.body.classList.toggle("dark");
-  localStorage.setItem("betonexaTheme", document.body.classList.contains("dark") ? "dark" : "light");
-});
-
-plants.forEach(plant => {
-  const option = document.createElement("option");
-  option.textContent = plant;
-  option.value = plant;
-  $("plant").appendChild(option);
-});
-
-if (localStorage.getItem("betonexaTheme") === "dark") document.body.classList.add("dark");
-if (currentUser) showDashboard(currentUser);
+let shipments=JSON.parse(localStorage.getItem("betonexaShipmentsV2"))||defaultShipments;let activeFilter="all";let currentUser=localStorage.getItem("betonexaUser")||"";const $=id=>document.getElementById(id);const loginView=$("loginView"),dashboardView=$("dashboardView"),modal=$("modal"),shipmentList=$("shipmentList"),template=$("shipmentCardTemplate");
+function save(){localStorage.setItem("betonexaShipmentsV2",JSON.stringify(shipments))}function toast(msg){const t=$("toast");t.textContent=msg;t.classList.remove("hidden");clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>t.classList.add("hidden"),2400)}
+function showDashboard(user){currentUser=user;localStorage.setItem("betonexaUser",user);$("welcomeName").textContent=user.split(" ")[0];loginView.classList.remove("active");dashboardView.classList.add("active");render()}function showLogin(){localStorage.removeItem("betonexaUser");dashboardView.classList.remove("active");loginView.classList.add("active")}
+function formatDate(s){return new Intl.DateTimeFormat("tr-TR",{day:"2-digit",month:"short",weekday:"short"}).format(new Date(s+"T12:00:00"))}function dateTime(item){return new Date(`${item.date}T${item.time}:00`)}
+function getStatus(item){const now=new Date(),dt=dateTime(item),diff=(dt-now)/60000;if(item.date<todayISO()||diff<-90)return{key:"done",label:"Tamamlandı"};if(diff<0)return{key:"risk",label:"Gecikti"};if(diff<=90)return{key:"soon",label:"Yaklaşıyor"};return{key:"ok",label:item.date===todayISO()?"Planlandı":"Bekliyor"}}
+function conflictIds(){const ids=new Set();for(let i=0;i<shipments.length;i++)for(let j=i+1;j<shipments.length;j++){const a=shipments[i],b=shipments[j];if(a.date===b.date&&a.time===b.time&&a.pumpStatus==="Pompalı"&&b.pumpStatus==="Pompalı"&&a.pumpType===b.pumpType){ids.add(a.id);ids.add(b.id)}}return ids}
+function render(){const q=$("searchInput").value.trim().toLocaleLowerCase("tr-TR"),today=todayISO(),conflicts=conflictIds();const filtered=shipments.filter(item=>{const st=getStatus(item);if(activeFilter==="today"&&item.date!==today)return false;if(activeFilter==="upcoming"&&!(st.key==="soon"||st.key==="ok"))return false;if(activeFilter==="risk"&&!(st.key==="risk"||conflicts.has(item.id)))return false;if(activeFilter==="pompalı"&&item.pumpStatus!=="Pompalı")return false;if(activeFilter==="pompasız"&&item.pumpStatus!=="Pompasız")return false;return `${item.site} ${item.company} ${item.plant}`.toLocaleLowerCase("tr-TR").includes(q)}).sort((a,b)=>dateTime(a)-dateTime(b));shipmentList.innerHTML="";if(!filtered.length)shipmentList.innerHTML='<div class="empty-state">Bu seçime uygun sevkiyat bulunamadı.</div>';
+filtered.forEach(item=>{const c=template.content.cloneNode(true),st=getStatus(item),hasConflict=conflicts.has(item.id);const article=c.querySelector(".shipment-card");article.classList.add(hasConflict?"risk":st.key);c.querySelector(".date-line").textContent=`${formatDate(item.date)} • ${item.time}`;c.querySelector(".site-line").textContent=item.site;c.querySelector(".company-line").textContent=item.company;c.querySelector(".status-badge").textContent=hasConflict?"Pompa çakışması":st.label;c.querySelector(".plant-line").textContent=item.plant;c.querySelector(".concrete-line").textContent=`${item.concreteClass} / ${item.slump}`;c.querySelector(".amount-line").textContent=`${item.amount} m³`;c.querySelector(".pump-line").textContent=item.pumpStatus==="Pompalı"?item.pumpType:"Pompasız";c.querySelector(".contact-line").textContent=item.contact||"Sorumlu bilgisi yok";c.querySelector(".edit-btn").onclick=()=>openModal(item);c.querySelector(".delete-btn").onclick=()=>{if(confirm("Bu sevkiyat silinsin mi?")){shipments=shipments.filter(x=>x.id!==item.id);save();render();toast("Sevkiyat silindi")}};shipmentList.appendChild(c)});renderSummary(conflicts);renderTimeline();renderCapacity();renderIQ(conflicts)}
+function renderSummary(conflicts){const today=shipments.filter(x=>x.date===todayISO()),now=new Date();$("totalM3").textContent=today.reduce((s,x)=>s+Number(x.amount),0);$("activeCount").textContent=today.filter(x=>{const d=dateTime(x);return (d-now)/60000>-90}).length;$("activePlants").textContent=new Set(today.map(x=>x.plant)).size;const risks=new Set([...conflicts,...today.filter(x=>getStatus(x).key==="risk").map(x=>x.id)]);$("riskCount").textContent=risks.size;$("riskHint").textContent=risks.size?"Müdahale gerekiyor":"Plan temiz";$("m3Trend").textContent=today.length?`${today.length} sevkiyatta planlandı`:"Bugün plan yok";$("activeHint").textContent=today.length?"Bugünkü iş akışı":"Operasyon bekliyor"}
+function renderTimeline(){const list=$("timelineList"),today=shipments.filter(x=>x.date===todayISO()).sort((a,b)=>a.time.localeCompare(b.time));list.innerHTML=today.length?"":'<div class="empty-state">Bugün için plan yok.</div>';today.slice(0,6).forEach((x,i)=>{const el=document.createElement("div");el.className="timeline-item";el.innerHTML=`<div class="timeline-time">${x.time}</div><div class="timeline-track"><span class="timeline-dot"></span>${i<today.length-1?'<span class="timeline-line"></span>':''}</div><div class="timeline-content"><strong>${x.site}</strong><span>${x.plant} • ${x.amount} m³</span></div>`;list.appendChild(el)})}
+function renderCapacity(){const list=$("capacityList"),today=shipments.filter(x=>x.date===todayISO()),map={};today.forEach(x=>map[x.plant]=(map[x.plant]||0)+Number(x.amount));const rows=Object.entries(map).sort((a,b)=>b[1]-a[1]).slice(0,5);list.innerHTML=rows.length?"":'<div class="empty-state">Kapasite verisi yok.</div>';rows.forEach(([plant,m3])=>{const pct=Math.min(100,Math.round(m3/1.2));const el=document.createElement("div");el.className="capacity-row";el.innerHTML=`<div class="capacity-row-head"><span>${plant}</span><span>${pct}%</span></div><div class="capacity-bar"><div class="capacity-fill ${pct>80?'high':''}" style="width:${pct}%"></div></div>`;list.appendChild(el)})}
+function renderIQ(conflicts){const risk=conflicts.size;if(risk){$("smartAlertText").textContent=`${risk} sevkiyatta aynı saat ve pompa tipi çakışması tespit edildi. Planı kontrol et.`;return}const today=shipments.filter(x=>x.date===todayISO());const busiest=Object.entries(today.reduce((m,x)=>(m[x.plant]=(m[x.plant]||0)+Number(x.amount),m),{})).sort((a,b)=>b[1]-a[1])[0];$("smartAlertText").textContent=busiest?`${busiest[0]} bugün ${busiest[1]} m³ ile en yoğun santral. Operasyon akışı dengeli görünüyor.`:"Bugün için henüz sevkiyat planı oluşturulmadı."}
+function openModal(item=null){$("modalTitle").textContent=item?"Sevkiyatı Düzenle":"Yeni Sevkiyat";$("editId").value=item?.id||"";$("date").value=item?.date||todayISO();$("time").value=item?.time||"08:00";$("plant").value=item?.plant||plants[0];$("company").value=item?.company||"";$("site").value=item?.site||"";$("concreteClass").value=item?.concreteClass||"C30/37";$("amount").value=item?.amount||30;$("pumpStatus").value=item?.pumpStatus||"Pompalı";$("pumpType").value=item?.pumpType==="-"?"47'lik":item?.pumpType||"47'lik";$("slump").value=item?.slump||"S3";$("gross").value=item?.gross||"Hayır";$("additive").value=item?.additive||"Standart";$("contact").value=item?.contact||"";togglePumpType();checkConflict();modal.classList.remove("hidden")}
+function closeModal(){modal.classList.add("hidden")}function togglePumpType(){const d=$("pumpStatus").value==="Pompasız";$("pumpType").disabled=d;checkConflict()}function checkConflict(){const id=Number($("editId").value||0),conf=$("pumpStatus").value==="Pompalı"&&shipments.some(x=>x.id!==id&&x.date===$("date").value&&x.time===$("time").value&&x.pumpStatus==="Pompalı"&&x.pumpType===$("pumpType").value);$("conflictWarning").classList.toggle("hidden",!conf)}
+function applyTheme(mode){localStorage.setItem("betonexaTheme",mode);const actual=mode==="system"?(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):mode;document.documentElement.dataset.theme=actual;document.querySelector('meta[name="theme-color"]').content=actual==="dark"?"#0c1016":"#eef1f5";$("themeMenu").classList.add("hidden")}
+$("loginBtn").onclick=()=>{$("passwordInput").value!=="1234"?toast("Şifre hatalı. Demo şifresi 1234."):showDashboard($("userSelect").value)};$("logoutBtn").onclick=showLogin;$("addShipmentBtn").onclick=()=>openModal();$("closeModalBtn").onclick=closeModal;$("modalBackdrop").onclick=closeModal;$("searchInput").oninput=render;$("pumpStatus").onchange=togglePumpType;["date","time","pumpType"].forEach(id=>$(id).onchange=checkConflict);$("themeBtn").onclick=()=>$("themeMenu").classList.toggle("hidden");document.querySelectorAll("[data-theme]").forEach(b=>b.onclick=()=>applyTheme(b.dataset.theme));$("dismissAlertBtn").onclick=()=>$("smartAlert").classList.add("hidden");$("quickReportBtn").onclick=()=>toast(`Bugün ${$("totalM3").textContent} m³ ve ${$("activeCount").textContent} aktif sevkiyat var.`);$("notificationBtn").onclick=()=>toast($("riskCount").textContent==="0"?"Yeni kritik bildirim yok.":`${$("riskCount").textContent} kritik plan bildirimi var.`);
+document.querySelectorAll(".filter-chip").forEach(btn=>btn.onclick=()=>{document.querySelectorAll(".filter-chip").forEach(x=>x.classList.remove("active"));btn.classList.add("active");activeFilter=btn.dataset.filter;render()});
+$("shipmentForm").onsubmit=e=>{e.preventDefault();const id=Number($("editId").value||Date.now()),item={id,date:$("date").value,time:$("time").value,plant:$("plant").value,company:$("company").value.trim(),site:$("site").value.trim(),concreteClass:$("concreteClass").value,amount:Number($("amount").value),pumpStatus:$("pumpStatus").value,pumpType:$("pumpStatus").value==="Pompalı"?$("pumpType").value:"-",slump:$("slump").value,gross:$("gross").value,additive:$("additive").value,contact:$("contact").value.trim()};const i=shipments.findIndex(x=>x.id===id);i>=0?shipments[i]=item:shipments.push(item);save();closeModal();render();toast(i>=0?"Sevkiyat güncellendi":"Yeni sevkiyat eklendi")};
+plants.forEach(p=>{const o=document.createElement("option");o.textContent=o.value=p;$("plant").appendChild(o)});$("todayLabel").textContent=new Intl.DateTimeFormat("tr-TR",{weekday:"long",day:"numeric",month:"long"}).format(new Date());applyTheme(localStorage.getItem("betonexaTheme")||"system");if(currentUser)showDashboard(currentUser);

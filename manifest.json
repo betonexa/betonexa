@@ -1,9 +1,1 @@
-{
-  "name": "Betonexa Demo",
-  "short_name": "Betonexa",
-  "start_url": ".",
-  "display": "standalone",
-  "background_color": "#f3f5f8",
-  "theme_color": "#151a22",
-  "description": "Beton sevkiyat planlama demo uygulaması"
-}
+{"name":"Betonexa - Akıllı Beton Sevkiyat Yönetimi","short_name":"Betonexa","start_url":".","display":"standalone","background_color":"#eef1f5","theme_color":"#111722","description":"Santral, pompa ve beton sevkiyat operasyonları için akıllı yönetim paneli"}
