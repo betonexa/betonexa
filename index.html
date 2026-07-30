@@ -1,107 +1,136 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#111722" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>Betonexa | Akıllı Beton Sevkiyat Yönetimi</title>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#6c3df0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Betonexa Kişisel</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="ambient ambient-a"></div><div class="ambient ambient-b"></div>
-  <div class="app-shell">
+<div id="login" class="login-screen">
+  <div class="login-card">
+    <div class="logo-mark">B</div>
+    <div class="wordmark">BETON<span>EXA</span></div>
+    <p>Hazır Beton Sevkiyat Yönetimi</p>
+    <label>Şifre</label>
+    <div class="password-row">
+      <input id="password" type="password" value="1234" autocomplete="current-password">
+      <button id="eye" type="button" aria-label="Şifreyi göster">◉</button>
+    </div>
+    <button id="loginBtn" class="primary">Giriş Yap</button>
+    <small>Kişisel sürüm • Demo şifresi: 1234</small>
+  </div>
+</div>
+
+<div id="app" class="app hidden">
+  <aside class="sidebar">
+    <div class="brand"><div class="logo-mark small">B</div><div><b>BETON<span>EXA</span></b><small>Kişisel</small></div></div>
+    <nav>
+      <button class="nav active" data-view="dashboard">⌂ <span>Ana Sayfa</span></button>
+      <button class="nav" data-view="calendar">▦ <span>Takvim</span></button>
+      <button class="nav" data-view="shipments">☷ <span>Sevkiyatlar</span></button>
+      <button class="nav" data-view="reports">▥ <span>Raporlar</span></button>
+      <button class="nav" data-view="settings">⚙ <span>Ayarlar</span></button>
+    </nav>
+    <button id="logout" class="logout">Çıkış</button>
+  </aside>
+
+  <main>
     <header class="topbar">
-      <button class="brand-wrap" id="brandHomeBtn" aria-label="Ana sayfa">
-        <img class="brand-logo" src="assets/betonexa-logo.jpeg" alt="Betonexa logosu" />
-        <span class="brand-copy"><strong>Betonexa</strong><small>Akıllı Beton Sevkiyat Yönetimi</small></span>
-      </button>
-      <div class="top-actions">
-        <button class="icon-btn" id="notificationBtn" aria-label="Bildirimler"><span>◉</span><i id="notificationDot"></i></button>
-        <div class="theme-control" id="themeControl">
-          <button class="icon-btn" id="themeBtn" aria-label="Tema seçenekleri">◐</button>
-          <div class="theme-menu hidden" id="themeMenu">
-            <button data-theme="light">☀️ Açık</button><button data-theme="dark">🌙 Koyu</button><button data-theme="system">◐ Sistem</button>
-          </div>
-        </div>
-      </div>
+      <div><h1 id="pageTitle">Hazır Beton Sevkiyat Yönetimi</h1><p id="todayText"></p></div>
+      <div class="top-actions"><button id="themeBtn" class="icon">◐</button><button id="addBtn" class="primary">+ Yeni Sevkiyat</button></div>
     </header>
 
-    <main>
-      <section id="loginView" class="view active">
-        <div class="hero-card">
-          <div class="hero-copy">
-            <div class="eyebrow">BETONEXA CONTROL CENTER</div>
-            <h1>Beton sevkiyatını <span>akıllı</span> yönet.</h1>
-            <p>Santral, pompa ve döküm operasyonlarını tek ekranda planla. Çakışmaları önceden gör, günü kontrollü yönet.</p>
-            <div class="hero-badges"><span>Canlı planlama</span><span>Akıllı uyarılar</span><span>Mobil uyumlu</span></div>
-          </div>
-          <div class="login-card glass">
-            <div class="login-head"><div><small>GÜVENLİ GİRİŞ</small><h2>Kontrol paneline gir</h2></div><span class="security-pill">● Demo</span></div>
-            <label for="userSelect">Kullanıcı</label>
-            <select id="userSelect"><option>Özlem Gülbay</option><option>Cem Ekici</option><option>Ali Oğuz</option></select>
-            <label for="passwordInput">Şifre</label>
-            <input id="passwordInput" type="password" value="1234" placeholder="Şifre" />
-            <button id="loginBtn" class="primary-btn">Kontrol Paneline Gir <span>→</span></button>
-            <div class="demo-note">Demo şifresi: <strong>1234</strong></div>
-          </div>
+    <section id="dashboard" class="view active-view">
+      <div class="kpis">
+        <article><span>Bugünkü sevkiyat</span><strong id="kpiToday">0</strong></article>
+        <article><span>Bugünkü metraj</span><strong><i id="kpiTodayM3">0</i> m³</strong></article>
+        <article><span>Aylık toplam</span><strong><i id="kpiMonthM3">0</i> m³</strong></article>
+        <article><span>Pompalı sevkiyat</span><strong><i id="kpiPumped">0</i> m³</strong></article>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><div><h2>Bugünün Programı</h2><p>Dökümler saat sırasına göre gösterilir.</p></div><button class="ghost" data-go="calendar">Takvimi Aç</button></div>
+        <div id="todayList" class="cards"></div>
+      </div>
+
+      <div id="conflictPanel" class="panel alert-panel hidden">
+        <div class="panel-head"><div><h2>Yaklaşan Çakışmalar</h2><p>47, 52 ve 56'lık pompalardaki aynı saatli kayıtlar.</p></div><span id="conflictCount" class="alert-count">0</span></div>
+        <div id="conflictList" class="cards"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><div><h2>Son Girilen Sevkiyatlar</h2><p>En son kaydedilen 10 sevkiyat gösterilir.</p></div><button class="ghost" data-go="shipments">Tümünü Gör</button></div>
+        <div id="recentList" class="cards"></div>
+      </div>
+    </section>
+
+    <section id="calendar" class="view">
+      <div class="panel">
+        <div class="calendar-toolbar">
+          <button id="prevWeek" class="ghost">‹</button><button id="thisWeek" class="ghost">Bu Hafta</button><button id="nextWeek" class="ghost">›</button>
+          <strong id="weekLabel"></strong>
         </div>
-      </section>
+        <div id="weekGrid" class="week-grid"></div>
+      </div>
+    </section>
 
-      <section id="dashboardView" class="view">
-        <div class="welcome-row">
-          <div><div class="muted" id="todayLabel">Bugün</div><h1>Günaydın, <span id="welcomeName">Özlem Gülbay</span></h1><p class="muted">Operasyonun genel görünümü ve öncelikli işler burada.</p></div>
-          <div class="welcome-actions"><button id="quickReportBtn" class="secondary-btn">Rapor Özeti</button><button id="logoutBtn" class="text-btn">Çıkış</button></div>
+    <section id="shipments" class="view">
+      <div class="panel">
+        <div class="filters">
+          <input id="search" placeholder="Firma, şantiye veya santral ara">
+          <select id="filter"><option value="all">Tümü</option><option value="today">Bugün</option><option value="pumped">Pompalı</option><option value="unpumped">Pompasız</option></select>
         </div>
+        <div id="shipmentList" class="cards"></div>
+      </div>
+    </section>
 
-        <div class="smart-alert" id="smartAlert"><div class="iq-icon">IQ</div><div><strong>Betonexa IQ</strong><p id="smartAlertText">Plan analiz ediliyor...</p></div><button id="dismissAlertBtn" aria-label="Uyarıyı kapat">×</button></div>
+    <section id="reports" class="view">
+      <div class="kpis report-kpis">
+        <article><span>Toplam kayıt</span><strong id="rCount">0</strong></article>
+        <article><span>Toplam metraj</span><strong><i id="rM3">0</i> m³</strong></article>
+        <article><span>Pompalı metraj</span><strong><i id="rPump">0</i> m³</strong></article>
+        <article><span>Aktif firma</span><strong id="rCompanies">0</strong></article>
+      </div>
+      <div class="panel"><h2>Firma Bazında Metraj</h2><div id="companyReport" class="report-list"></div></div>
+    </section>
 
-        <div class="summary-grid">
-          <article class="summary-card accent-card"><div class="summary-icon">m³</div><span>Bugünkü hacim</span><strong><span id="totalM3">0</span> <small>m³</small></strong><em id="m3Trend">Günlük plan</em></article>
-          <article class="summary-card"><div class="summary-icon">🚚</div><span>Aktif sevkiyat</span><strong id="activeCount">0</strong><em id="activeHint">Devam eden işler</em></article>
-          <article class="summary-card"><div class="summary-icon">🏭</div><span>Aktif santral</span><strong id="activePlants">0</strong><em>Bugün üretimde</em></article>
-          <article class="summary-card"><div class="summary-icon">⚠</div><span>Riskli plan</span><strong id="riskCount">0</strong><em id="riskHint">Çakışma / gecikme</em></article>
-        </div>
+    <section id="settings" class="view">
+      <div class="panel settings-grid">
+        <div><h2>Veri Yedekleme</h2><p>Kayıtlarını JSON dosyası olarak indir veya daha önce aldığın yedeği geri yükle.</p><div class="button-row"><button id="exportJson" class="primary">Yedeği İndir</button><label class="ghost file-label">Yedeği Yükle<input id="importJson" type="file" accept="application/json"></label></div></div>
+        <div><h2>Excel İçin Dışa Aktar</h2><p>Tüm sevkiyatları Excel'in açabileceği CSV dosyasına aktar.</p><button id="exportCsv" class="ghost">CSV İndir</button></div>
+        <div><h2>Verileri Temizle</h2><p>Bu cihazdaki tüm sevkiyat kayıtlarını siler.</p><button id="clearData" class="danger">Tüm Kayıtları Sil</button></div>
+      </div>
+    </section>
+  </main>
+</div>
 
-        <div class="content-grid">
-          <section class="panel operations-panel">
-            <div class="panel-head"><div><span class="eyebrow">OPERASYON AKIŞI</span><h2>Sevkiyat Planı</h2></div><button id="addShipmentBtn" class="primary-btn compact">+ Yeni Sevkiyat</button></div>
-            <div class="toolbar"><div class="search-wrap"><span>⌕</span><input id="searchInput" type="search" placeholder="Firma, şantiye veya santral ara" /></div></div>
-            <div class="filter-row"><button class="filter-chip active" data-filter="all">Tümü</button><button class="filter-chip" data-filter="today">Bugün</button><button class="filter-chip" data-filter="upcoming">Yaklaşan</button><button class="filter-chip" data-filter="risk">Riskli</button><button class="filter-chip" data-filter="pompalı">Pompalı</button><button class="filter-chip" data-filter="pompasız">Pompasız</button></div>
-            <div id="shipmentList" class="shipment-list"></div>
-          </section>
-
-          <aside class="side-stack">
-            <section class="panel timeline-panel"><div class="panel-head small"><div><span class="eyebrow">BUGÜN</span><h3>Zaman Çizelgesi</h3></div><span class="live-pill">● Canlı</span></div><div id="timelineList" class="timeline-list"></div></section>
-            <section class="panel capacity-panel"><div class="panel-head small"><div><span class="eyebrow">KAPASİTE</span><h3>Santral Yoğunluğu</h3></div></div><div id="capacityList" class="capacity-list"></div></section>
-          </aside>
-        </div>
-      </section>
-    </main>
-  </div>
-
-  <div id="toast" class="toast hidden"></div>
-  <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
-    <div class="modal-backdrop" id="modalBackdrop"></div>
-    <div class="modal-card">
-      <div class="modal-head"><div><div class="eyebrow">SEVKİYAT FORMU</div><h3 id="modalTitle">Yeni Sevkiyat</h3></div><button class="icon-btn" id="closeModalBtn">✕</button></div>
-      <form id="shipmentForm"><input type="hidden" id="editId" />
-        <div class="form-grid two"><div><label for="date">Tarih</label><input id="date" type="date" required /></div><div><label for="time">Saat</label><input id="time" type="time" required /></div></div>
-        <label for="plant">Santral</label><select id="plant" required></select>
-        <div class="form-grid two"><div><label for="company">Firma</label><input id="company" type="text" placeholder="Firma adı" required /></div><div><label for="site">Şantiye</label><input id="site" type="text" placeholder="Şantiye / bölge" required /></div></div>
-        <div class="form-grid two"><div><label for="concreteClass">Beton sınıfı</label><select id="concreteClass"><option>C25/30</option><option>C30/37</option><option>C35/45</option><option>C40/50</option><option>C45/55</option></select></div><div><label for="amount">Miktar (m³)</label><input id="amount" type="number" min="1" step="1" value="30" required /></div></div>
-        <div class="form-grid two"><div><label for="pumpStatus">Pompa</label><select id="pumpStatus"><option value="Pompalı">Pompalı</option><option value="Pompasız">Pompasız</option></select></div><div><label for="pumpType">Pompa tipi</label><select id="pumpType"><option>38'lik</option><option>42'lik</option><option>47'lik</option><option>52'lik</option><option>56'lık</option></select></div></div>
-        <div class="form-grid three"><div><label for="slump">Kıvam</label><select id="slump"><option>S3</option><option>S4</option></select></div><div><label for="gross">Brüt</label><select id="gross"><option>Hayır</option><option>Evet</option></select></div><div><label for="additive">Katkı</label><select id="additive"><option>Standart</option><option>Katkısız</option></select></div></div>
-        <label for="contact">Sorumlu / Telefon</label><input id="contact" type="text" placeholder="Ad Soyad - 05xx xxx xx xx" />
-        <div id="conflictWarning" class="warning hidden">⚠ Bu tarih ve saatte aynı pompa tipi için başka bir sevkiyat bulunuyor.</div>
-        <button class="primary-btn" type="submit">Sevkiyatı Kaydet</button>
-      </form>
+<div id="modal" class="modal hidden">
+  <div class="backdrop"></div>
+  <form id="shipmentForm" class="modal-card">
+    <div class="modal-head"><div><h2 id="modalTitle">Yeni Sevkiyat</h2><p>Zorunlu alanları doldur.</p></div><button id="closeModal" type="button" class="icon">×</button></div>
+    <input id="editId" type="hidden">
+    <div class="form-grid">
+      <label>Tarih<input id="date" type="date" required></label>
+      <label>Saat<input id="time" type="time" required></label>
+      <label>Santral<select id="plant" required></select></label>
+      <label>Firma<input id="company" required placeholder="Firma adı"></label>
+      <label class="wide">Şantiye<input id="site" required placeholder="Şantiye / proje adı"></label>
+      <label>Beton sınıfı<select id="concreteClass"><option>C20/25</option><option>C25/30</option><option selected>C30/37</option><option>C35/45</option><option>C40/50</option></select></label>
+      <label>Beton özelliği<select id="slump"><option>S3</option><option>S4</option><option>Katkısız</option><option>Brüt</option><option>Su Geçirimsiz</option></select></label>
+      <label>Metraj (m³)<input id="amount" type="number" min="0.5" step="0.5" required></label>
+      <label>Pompa durumu<select id="pumpStatus"><option>Pompalı</option><option>Pompasız</option></select></label>
+      <label>Pompa boyu<select id="pumpType"><option>38'lik</option><option>42'lik</option><option selected>47'lik</option><option>52'lik</option><option>56'lık</option></select></label>
+      <label>Sorumlu kişi<input id="contactName" placeholder="Ad Soyad"></label>
+      <label>Telefon<input id="phone" inputmode="tel" placeholder="05xx xxx xx xx"></label>
+      <label class="wide">Not<textarea id="note" rows="3" placeholder="Dökümle ilgili not"></textarea></label>
     </div>
-  </div>
-
-  <template id="shipmentCardTemplate"><article class="shipment-card"><div class="status-rail"></div><div class="shipment-top"><div><div class="date-line"></div><h3 class="site-line"></h3><div class="company-line muted"></div></div><span class="status-badge"></span></div><div class="shipment-details"><div><span>Santral</span><strong class="plant-line"></strong></div><div><span>Beton</span><strong class="concrete-line"></strong></div><div><span>Miktar</span><strong class="amount-line"></strong></div><div><span>Pompa</span><strong class="pump-line"></strong></div></div><div class="shipment-footer"><span class="contact-line"></span><div><button class="small-btn edit-btn">Düzenle</button><button class="small-btn danger delete-btn">Sil</button></div></div></article></template>
-  <script src="app.js"></script>
-</body>
-</html>
+    <div id="conflict" class="warning hidden">⚠ Aynı tarih ve saatte bu pompa için başka bir sevkiyat var.</div>
+    <div class="modal-actions"><button id="deleteBtn" type="button" class="danger hidden">Sil</button><span></span><button id="cancelBtn" type="button" class="ghost">İptal</button><button class="primary" type="submit">Kaydet</button></div>
+  </form>
+</div>
+<script src="app.js"></script>
+</body></html>
