@@ -1,0 +1,13 @@
+BETONEXA PWA
+
+Kurulum:
+1. Bu klasörü GitHub deponuza yükleyin.
+2. Vercel ile yayınlayın.
+3. iPhone'da Safari'den yayınlanan adresi açın.
+4. Paylaş düğmesine dokunun.
+5. "Ana Ekrana Ekle" seçeneğini seçin.
+6. Betonexa uygulama gibi açılacaktır.
+
+Not:
+- PWA kurulumu için dosyanın internet üzerinden HTTPS ile yayınlanması gerekir.
+- Sadece dosyayı telefona indirmek, uygulama kurulumu için yeterli değildir.
